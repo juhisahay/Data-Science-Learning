@@ -5,6 +5,7 @@
 import pandas as pd
 import matplotlib.pylab as plt
 import datetime
+import re
 
 pd.set_option("display.max_rows", 500)  # Why columns? Dataset has 5 rows
 
@@ -77,3 +78,82 @@ tweets["tweet_text"] = tweets["tweet_text"].str.replace("⬜", "⬛")  # how to 
 def parse_tweet_text(tweets):
     for n in range(6):
         n += 1  # parse out what the boxes look like for each attempt
+        tweets[f"has_guess{n}"] = (
+            tweets["tweet_text"]
+            .str.split("\n")
+            .str[n + 1]
+            .str.contains("|".join(["🟨", "⬛", "🟩"]))
+            .fillna(False)
+        )
+
+        # Parse out the tweet text
+        tweets.loc[tweets[f"has_guess{n}"], f"guess{n}"] = (
+            tweets["tweet_text"].str.split("\n").str[n + 1].str[:5]
+        )
+
+        # Count number cprrect, misplaced, and incorrect
+        tweets.loc[tweets[f"has_guess{n}"], f"guess{n}_incorrect"] = tweets[
+            f"guess{n}"
+        ].str.count("⬛")
+
+        tweets.loc[tweets[f"has_guess{n}"], f"guess{n}_wrong_spot"] = tweets[
+            f"guess{n}"
+        ].str.count("🟨")
+
+        tweets.loc[tweets[f"has_guess{n}"], f"guess{n}_correct"] = tweets[
+            f"guess{n}"
+        ].str.count("🟩")
+
+        tweets.loc[tweets[f"guess{n}_correct"] == 6, "final_guess"] = n
+
+        return tweets
+
+
+tweets = parse_tweet_text(tweets)
+
+# Keep additional tweet text
+tweets["additional_text"] = (
+    tweets.loc[~tweets["tweet_text"].str.split("\n").str[-1].str.contains("🟩")][
+        "tweet_text"
+    ]
+    .str.split("\n")
+    .str[-1]
+)
+
+
+# Plot results by Attempt
+fig, axs = plt.subplots(1, 3, figsize=(12, 5), sharex=True)
+
+for i, x in enumerate(["_correct", "_wrong_spot", "_incorrect"]):
+    col_subset = [c for c in tweets.columns if x in c]
+    guess_avg = tweets[col_subset].mean()
+    guess_avg.index = [f"Guess {i + 1}" for i in range(6)]
+    guess_avg.sort_index(ascending=False).plot(
+        kind="barh",
+        title=f"{x.strip('_').replace('_', ' ').title()}",
+        ax=axs[i],
+        color=color_pal[i + 1],
+    )
+    axs[i].set_xlabel("Average Letters")
+fig.suptitle("Wordle Average Results by Guess Number", fontsize=18)
+plt.tight_layout()
+plt.show()
+
+# Letter Analysis
+first_guess_correct = []
+for i, d in tweets.dropna(subset=["answer"]).iterrows():
+    example_text = d["guess1"]
+    example_solution = d["answer"]
+    results = [x.span()[0] for x in re.finditer("🟩", example_text)]
+    first_guess_letters = [example_solution[i] for i in results]
+    first_guess_correct += first_guess_letters
+
+pd.Series(first_guess_correct).value_counts(ascending=True).plot(
+    kind="barh",
+    figsize=(10, 5),
+    title="Most Common Correct First Guess Letters",
+    edgecolor="black",
+    color=color_pal[5],
+)
+plt.show()
+# %%
