@@ -6,11 +6,11 @@ import pandas as pd
 import matplotlib.pylab as plt
 import datetime
 import re
+from itertools import cycle
 
 pd.set_option("display.max_rows", 500)  # Why columns? Dataset has 5 rows
 
 # For plotting
-from itertools import cycle
 
 plt.style.use("ggplot")
 color_pal = plt.rcParams["axes.prop_cycle"].by_key()["color"]
@@ -49,9 +49,11 @@ tweets.groupby("tweet_date").size().plot(
 )
 plt.show()  # running a plot
 
-# Number of Attempts analysis by Worlde ID
+# Number of Attempts analysis by Worlde ID- How to display this?
 # unstack() - makes number of attempts our columns instead of a multi index
-tweets.groupby("wordle_id")["n_attempts"].value_counts().unstack()
+number_of_attempts_graph = (
+    tweets.groupby("wordle_id")["n_attempts"].value_counts().unstack()
+)
 # .style.background_gradient(axis=1)
 
 # How many attempts does it usually take to solve?
