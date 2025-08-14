@@ -1,12 +1,13 @@
 # Youtube Tutorial: https://youtu.be/7SRcYdd9JcY?si=BfSiQptk9fMkYKTk
-# credit for code goes to _______
+# credit for code goes to ___Rob Mulla____
 
 # %%
 import pandas as pd
 import matplotlib.pylab as plt
 import datetime
-import re
 from itertools import cycle
+import numpy as np
+
 
 pd.set_option("display.max_rows", 500)  # Why columns? Dataset has 5 rows
 
@@ -52,17 +53,24 @@ plt.show()  # running a plot
 # Number of Attempts analysis by Wordle ID
 # unstack() - makes number of attempts our columns instead of a multi index
 number_of_attempts_graph = (
-    tweets.groupby("wordle_id")["n_attempts"].value_counts() \
-    .unstack() \
-    .style.background_gradient(axis=1))
+    tweets.groupby("wordle_id")["n_attempts"]
+    .value_counts()
+    .unstack()
+    .style.background_gradient(axis=1)
+)
 
 # How many attempts does it usually take to solve?
-ax = tweets["n_attempts"].value_counts() \
-    .sort_index() \
-    .plot(figsize=(10, 5),
+ax = (
+    tweets["n_attempts"]
+    .value_counts()
+    .sort_index()
+    .plot(
+        figsize=(10, 5),
         kind="barh",
         title="Number of Wordle Attempts",
-        edgecolor="black")
+        edgecolor="black",
+    )
+)
 ax.set_xlabel("Number of Tweets")
 ax.set_ylabel("Number of Attempts Solved in")
 plt.show()
@@ -72,9 +80,37 @@ plt.show()
 tweets["tweet_text"] = tweets["tweet_text"].str.replace("⬜", "⬛")  # how to get color
 
 
-# Plot Results by Attempt ~ Do it yourself
+# Plot Results by Attempt - Wordle Average Results by Guess Number
+""" place code here """
+
+
+# Average number of guesses per wordle ID - Do it yourself
+def guessesPerID():
+    # group by ID
+    tweets['wordle_id'] = tweets['wordle_id'].str[8:11]
+    Avg = tweets.groupby("wordle_id")["n_attempts"].mean()
+
+    # Axes
+    fig, axs = plt.subplots(figsize=(10, 5))
+    axs.set_xlabel("Wordle ID")
+    axs.set_ylabel("Average Number of Attempts")
+    axs.set_title("Average Attempts per Wordle")
+
+    # Line graph
+    Avg.plot(kind="line", color="blue", marker= 'o', ax= axs)
+
+    # Plot horizontal average line
+    plt.axhline(y = np.nanmean(Avg), color = 'red', linestyle = '--', 
+                label= "overall average")
+    plt.legend(loc= "upper right")
+    
+    plt.show()
+
+guessesPerID()
 
 # Plot Letter Analysis- Most Common Correct First Guess Letters
+""" place code here"""
+
 
 
 # %%
