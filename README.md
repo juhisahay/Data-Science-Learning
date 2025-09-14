@@ -1,5 +1,5 @@
 # Data-Science-Learning 
-contains projects, tutorials
+contains practice work, follow-along projects & tutorials, notes & references 
 
 Wordle Tweet Dataset EDA by Rob Mulla (tutorial)
    Dataset by Ben Hamner

@@ -87,7 +87,7 @@ tweets["tweet_text"] = tweets["tweet_text"].str.replace("⬜", "⬛")  # how to 
 # Average number of guesses per wordle ID - Do it yourself
 def guessesPerID():
     # group by ID
-    tweets['wordle_id'] = tweets['wordle_id'].str[8:11]
+    tweets["wordle_id"] = tweets["wordle_id"].str[8:11]
     Avg = tweets.groupby("wordle_id")["n_attempts"].mean()
 
     # Axes
@@ -97,22 +97,21 @@ def guessesPerID():
     axs.set_title("Average Attempts per Wordle")
 
     # Line graph
-    Avg.plot(kind="line", color="blue", marker= 'o', ax= axs)
+    Avg.plot(kind="line", color="blue", marker="o", ax=axs)
 
     # Plot horizontal average line
-    plt.axhline(y = np.nanmean(Avg), color = 'red', linestyle = '--', 
-                label= "overall average")
-    plt.legend(loc= "upper right")
-    
+    plt.axhline(y=np.nanmean(Avg), color="red", linestyle="--", label="overall average")
+    plt.legend(loc="upper right")
+
     plt.show()
+
 
 guessesPerID()
 
 # Plot Letter Analysis- Most Common Correct First Guess Letters
 """ place code here"""
 
-# User participation 
-
+# User participation
 
 
 # %%
